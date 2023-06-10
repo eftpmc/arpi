@@ -15,7 +15,12 @@ app.get('/api/zoro/search/:keyword', async (req, res) => {
       const { keyword } = req.params;
       const searchUrl = `https://zoro.to/search?keyword=${encodeURIComponent(keyword)}`;
   
-      const browser = await puppeteer.launch({ headless: "new" });
+      const browser = await puppeteer.launch({
+        args: [
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+        ]
+      });
       const page = await browser.newPage();
       await page.goto(searchUrl);
   
