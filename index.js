@@ -1,5 +1,5 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
+const { executablePath: puppeteerExecutablePath } = require("puppeteer");
 
 const app = express();
 const port = 3000;
@@ -18,6 +18,7 @@ app.get('/api/zoro/search/:keyword', async (req, res) => {
       const browser = await puppeteer.launch({
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
         headless: true,
+        executablePath: puppeteerExecutablePath(),
       });
       
       const page = await browser.newPage();
