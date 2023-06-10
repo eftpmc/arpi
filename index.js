@@ -8,6 +8,8 @@ const port = 3000;
 app.use(express.json());
 
 // Define your routes and handlers here
+app.get('/', (req, res) => res.send("<h1>api 😾</h1>"));
+
 app.get('/api/zoro/search/:keyword', async (req, res) => {
     try {
       const { keyword } = req.params;
@@ -38,6 +40,5 @@ app.get('/api/zoro/search/:keyword', async (req, res) => {
   });
 
 // Start the server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+app.listen(process.env.PORT || 3000, 
+	() => console.log("Server is running..."));
