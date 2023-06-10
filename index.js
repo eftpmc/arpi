@@ -8,7 +8,7 @@ const port = 3000;
 app.use(express.json());
 
 // Define your routes and handlers here
-app.get('/', (req, res) => res.send("<h1>api 😾</h1>"));
+app.get('/', async (req, res) => res.send("<h1>api 😾</h1>"));
 
 app.get('/api/zoro/search/:keyword', async (req, res) => {
     try {
