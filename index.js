@@ -17,6 +17,7 @@ app.get('/api/zoro/search/:keyword', async (req, res) => {
   
       const browser = await puppeteer.launch({
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        executablePath: await chromium.executablePath,
         headless: true,
       });
       
