@@ -9,10 +9,12 @@ app.use(express.json());
 app.get('/', (req, res) => res.send("<h1>api 😾</h1>"));
 
 // Load routes
-const searchRoutes = require('./api/gogo/search');
+const gogoSearchRoutes = require('./api/anime/gogo/search');
+const nineSearchRoutes = require('./api/anime/9anime/search');
 
 // Register routes
-app.use('/api/gogo/search', searchRoutes);
+app.use('/api/anime/gogo/search', gogoSearchRoutes);
+app.use('/api/anime/9anime/search', nineSearchRoutes);
 
 // Start the server
 app.listen(process.env.PORT || 3000, () => console.log("Server is running..."));
