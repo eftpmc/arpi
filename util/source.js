@@ -1,4 +1,8 @@
 const puppeteer = require('puppeteer-extra');
+const path = require('path');
+const webdriver = require('selenium-webdriver');
+require('chromedriver');
+const chrome = require('selenium-webdriver/chrome');
 
 // Add stealth plugin and use defaults (all evasion techniques)
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
@@ -44,25 +48,29 @@ const scrapeMp4upload = async (url) => {
 };
 
 const scrapeStreamsb = async (url) => {
-    const browser = await puppeteer.launch({
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        headless: false,
-    });
+    let options = new chrome.Options();
+    options.setChromeBinaryPath(process.env.CHROME_BINARY_PATH);
+    let serviceBuilder = new chrome.ServiceBuilder(process.env.CHROME_DRIVER_PATH);
+    
+    //Don't forget to add these for heroku
+    options.addArguments("--headless");
+    options.addArguments("--disable-gpu");
+    options.addArguments("--no-sandbox");
+  
 
-    const page = await browser.newPage();
-    await page.goto(url);
+    let driver = new webdriver.Builder()
+        .forBrowser('chrome')
+        .setChromeOptions(options)
+        .setChromeService(serviceBuilder)
+        .build();
 
-    await page.waitForSelector('video.jw-video');
+    await driver.get(url);
 
-    const videoSource = await page.evaluate(() => {
-        const blob = document.querySelector('video.jw-video').getAttribute('src');
-        console.log(blob);
-        return null
-    });
+    const html = await driver.getPageSource();
 
-    await browser.close();
+    await driver.quit();
 
-    return videoSource;
+    return html;
 };
 
 module.exports = {
