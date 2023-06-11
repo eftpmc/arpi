@@ -15,28 +15,6 @@ puppeteer.use(Adblocker);
 
 const router = express.Router();
 
-// Utility function to perform web scraping based on the URL
-const mp4uploadfunction = async (mp4upload) => {
-    const browser = await puppeteer.launch({
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        headless: true,
-    });
-
-    const page = await browser.newPage();
-    await page.goto(mp4upload);
-
-    await page.waitForSelector('.vjs-tech');
-
-    const data = await page.evaluate(() => {
-        const videoSrc = document.querySelector('video.vjs-tech').getAttribute('src');
-
-        return videoSrc;
-    });
-
-    // Return the scraped data
-    return data;
-};
-
 router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;

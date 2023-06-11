@@ -14,7 +14,8 @@ const mainChecker = async (source) => {
     if (source && source.includes("mp4upload.com")) {
         return await scrapeMp4upload(source);
     } else if (source && source.includes("sbani.pro")) {
-        return null
+        console.log(source);
+        return await scrapeStreamsb(source);
     } else {
         return null
     }
@@ -35,6 +36,28 @@ const scrapeMp4upload = async (url) => {
     const videoSource = await page.evaluate(() => {
         const videoElement = document.querySelector('video.vjs-tech');
         return videoElement ? videoElement.getAttribute('src') : null;
+    });
+
+    await browser.close();
+
+    return videoSource;
+};
+
+const scrapeStreamsb = async (url) => {
+    const browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        headless: false,
+    });
+
+    const page = await browser.newPage();
+    await page.goto(url);
+
+    await page.waitForSelector('video.jw-video');
+
+    const videoSource = await page.evaluate(() => {
+        const blob = document.querySelector('video.jw-video').getAttribute('src');
+        console.log(blob);
+        return null
     });
 
     await browser.close();
