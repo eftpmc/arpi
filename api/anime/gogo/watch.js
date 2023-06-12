@@ -31,13 +31,16 @@ router.get('/:id', async (req, res) => {
         await page.waitForSelector('.anime_muti_link');
 
         const data = await page.evaluate(() => {
+            const gotakuLi = document.querySelector('li.vidcdn a');
+            const gotakuData = gotakuLi ? gotakuLi.getAttribute('data-video') : null;
+            
             const mp4uploadLi = document.querySelector('li.mp4upload a');
             const mp4uploadData = mp4uploadLi ? mp4uploadLi.getAttribute('data-video') : null;
 
             const streamsbLi = document.querySelector('li.streamsb a');
             const streamsbData = streamsbLi ? streamsbLi.getAttribute('data-video') : null;
 
-            return mp4uploadData || streamsbData || null;
+            return gotakuData || mp4uploadData || streamsbData || null;
         });
 
         await browser.close();
