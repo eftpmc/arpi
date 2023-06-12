@@ -31,16 +31,16 @@ router.get('/:keyword', async (req, res) => {
       height: 720,
     });
 
-    await page.type('input[name=q]', keyword, {delay: 20})
+    await page.type('input[name=q]', keyword, { delay: 20 });
 
-    await page.waitForSelector('.search-results')
+    await page.waitForSelector('.search-results');
 
     const data = await page.evaluate(() => {
       const animeList = Array.from(document.querySelectorAll('.search-results li'));
       return animeList.map((anime) => ({
-        title: anime.querySelector('.result-title').textContent.trim(),
-        url: `https://animepahe.ru${anime.querySelector('a').getAttribute('href')}`,
-        id: anime.querySelector('a').getAttribute('href').split('/').pop(),
+        title: anime.querySelector('.result-title')?.textContent?.trim() || 'No Title',
+        url: `https://animepahe.ru${anime.querySelector('a')?.getAttribute('href') || ''}`,
+        id: anime.querySelector('a')?.getAttribute('href')?.split('/').pop() || '',
       }));
     });
 
