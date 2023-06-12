@@ -5,6 +5,14 @@ const port = 3000;
 // Middleware to parse JSON bodies
 app.use(express.json());
 
+// Add a middleware to set the CORS headers
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173'); // Replace with your domain
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE'); // Allow specific HTTP methods
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow specific headers
+  next();
+});
+
 // Define your routes and handlers here
 app.get('/', (req, res) => res.send("<h1>api 😾</h1>"));
 
@@ -18,7 +26,6 @@ const gotakuSearchRoutes = require('./api/anime/gotaku/search');
 
 const paheSearchRoutes = require('./api/anime/pahe/search');
 const paheWatchRoutes = require('./api/anime/pahe/watch');
-
 
 // Register routes
 app.use('/api/anime/gogo/search', gogoSearchRoutes);
