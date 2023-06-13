@@ -20,7 +20,7 @@ router.get('/:keyword', async (req, res) => {
     });
     await page.goto(BASE_URL);
 
-    await page.waitForSelector('.input-search');
+    await page.waitForSelector('.navbar');
 
     await page.type('input[name=q]', keyword, { delay: 20 });
 
