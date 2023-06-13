@@ -53,6 +53,8 @@ router.get('/:id/:requestedEp', async (req, res) => {
 
     const result = await mainChecker(episodeData.href);
 
+    await browser.close();
+
     if (result) {
       res.json(result);
     } else {
