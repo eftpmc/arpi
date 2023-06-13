@@ -14,12 +14,13 @@ router.get('/:keyword', async (req, res) => {
     });
 
     const page = await browser.newPage();
+    await page.setViewport({
+      width: 1920,
+      height: 1080,
+    });
     await page.goto(BASE_URL);
 
-    await page.setViewport({
-      width: 1080,
-      height: 720,
-    });
+    await page.waitForSelector('.input-search');
 
     await page.type('input[name=q]', keyword, { delay: 20 });
 
