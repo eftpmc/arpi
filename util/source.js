@@ -118,7 +118,7 @@ const scrapePahe = async (url) => {
         await page.click(".click-to-load");
 
         // Wait for a delay after the click (adjust the milliseconds as needed)
-        await page.waitForTimeout(1000);
+        //await page.waitForTimeout(1000);
 
         // Intercept network requests
         await page.setRequestInterception(true);
