@@ -1,5 +1,15 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+
+// Add stealth plugin and use defaults (all evasion techniques)
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+puppeteer.use(StealthPlugin());
+
+const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
+const Adblocker = AdblockerPlugin({
+  blockTrackers: true, // default: false
+});
+puppeteer.use(Adblocker);
 
 const router = express.Router();
 

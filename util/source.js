@@ -1,8 +1,18 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 
 const webdriver = require('selenium-webdriver');
 require('chromedriver');
 const chrome = require('selenium-webdriver/chrome');
+
+// Add stealth plugin and use defaults (all evasion techniques)
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+puppeteer.use(StealthPlugin());
+
+const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
+const Adblocker = AdblockerPlugin({
+    blockTrackers: true, // default: false
+});
+puppeteer.use(Adblocker);
 
 const mainChecker = async (source) => {
     try {

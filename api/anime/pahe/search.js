@@ -1,5 +1,15 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+
+// Add stealth plugin and use defaults (all evasion techniques)
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+puppeteer.use(StealthPlugin());
+
+const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
+const Adblocker = AdblockerPlugin({
+  blockTrackers: true, // default: false
+});
+puppeteer.use(Adblocker);
 
 const router = express.Router();
 
@@ -14,11 +24,12 @@ router.get('/:keyword', async (req, res) => {
     });
 
     const page = await browser.newPage();
-    await page.setViewport({
-      width: 1920,
-      height: 1080,
-    });
     await page.goto(BASE_URL);
+
+    await page.setViewport({
+      width: 1080,
+      height: 720,
+    });
 
     await page.waitForSelector('.navbar');
 
