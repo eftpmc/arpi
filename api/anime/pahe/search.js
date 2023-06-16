@@ -41,6 +41,7 @@ router.get('/:keyword', async (req, res) => {
       const animeList = Array.from(document.querySelectorAll('.search-results li'));
       return animeList.map((anime) => ({
         title: anime.querySelector('.result-title')?.textContent?.trim() || 'No Title',
+        img: anime.querySelector('a img')?.getAttribute("data-src") || '',
         url: `https://animepahe.ru${anime.querySelector('a')?.getAttribute('href') || ''}`,
         id: anime.querySelector('a')?.getAttribute('href')?.split('/').pop() || '',
       }));
