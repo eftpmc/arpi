@@ -7,7 +7,7 @@ app.use(express.json());
 
 // Add a middleware to set the CORS headers
 app.use((req, res, next) => {
-  const allowedOrigins = ['http://localhost:5173', 'https://aritools.vercel.app'];
+  const allowedOrigins = ['http://localhost:5173', 'https://aritools.vercel.app','https://superb-kheer-7cb5da.netlify.app'];
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
