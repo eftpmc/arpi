@@ -1,17 +1,7 @@
 const express = require('express');
-const puppeteer = require('puppeteer-extra');
+const axios = require('axios');
 
 const { mainChecker } = require('../../../util/source');
-
-// Add stealth plugin and use defaults (all evasion techniques)
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-puppeteer.use(StealthPlugin());
-
-const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
-const Adblocker = AdblockerPlugin({
-  blockTrackers: true, // default: false
-});
-puppeteer.use(Adblocker);
 
 const router = express.Router();
 
@@ -23,47 +13,26 @@ router.get('/:id/:requestedEp', async (req, res) => {
       return res.status(400).json({ error: 'Anime ID and episode ID are required' });
     }
 
-    const searchUrl = `https://animepahe.ru/anime/${encodeURIComponent(id)}`;
+    const perPage = 30;
+    const pageNumber = Math.ceil(requestedEp / perPage); // Calculate the page number
 
-    const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      headless: true,
-    });
+    const searchUrl = `https://animepahe.ru/api?m=release&id=${encodeURIComponent(id)}&sort=episode_asc&page=${pageNumber}`;
 
-    const page = await browser.newPage();
+    const response = await axios.get(searchUrl);
 
-    // Get list of episodes
-    await page.goto(searchUrl);
+    const { total, per_page, data } = response.data;
 
-    await page.waitForSelector('.episode');
+    if (total < requestedEp) {
+      return res.status(404).json({ error: 'Episode not found' });
+    }
 
-    const episodeID = await page.evaluate(() => {
-      return document.querySelector('.play').getAttribute('href').split('/').pop();
-    });
-
-    await page.goto(`https://animepahe.ru/play/${encodeURIComponent(id)}/${encodeURIComponent(episodeID)}`);
-
-    // Scrape the website for episode links
-    const episodeLinks = await page.evaluate(() => {
-      const dropdownMenu = document.querySelector('.dropdown-menu div');
-      const anchorElements = dropdownMenu.querySelectorAll('a');
-      const links = Array.from(anchorElements).map((anchor) => {
-        const text = anchor.textContent.trim();
-        const episodeNumber = Number(text.replace('Episode ', ''));
-        return { episodeNumber, href: anchor.href };
-      });
-      return links;
-    });
-
-    const episodeData = episodeLinks.find((link) => link.episodeNumber == requestedEp);
+    const episodeData = data.find((episode) => episode.episode == requestedEp);
 
     if (!episodeData) {
       return res.status(404).json({ error: 'Episode not found' });
     }
 
-    const result = await mainChecker(episodeData.href);
-
-    await browser.close();
+    const result = await mainChecker(`https://animepahe.ru/play/${id}/${episodeData.session}`);
 
     if (result) {
       res.json(result);
@@ -72,7 +41,7 @@ router.get('/:id/:requestedEp', async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'An error occurred while scraping the website' });
+    res.status(500).json({ error: 'An error occurred while fetching episode links' });
   }
 });
 

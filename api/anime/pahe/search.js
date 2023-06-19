@@ -1,58 +1,28 @@
 const express = require('express');
-const puppeteer = require('puppeteer-extra');
-
-// Add stealth plugin and use defaults (all evasion techniques)
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-puppeteer.use(StealthPlugin());
-
-const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
-const Adblocker = AdblockerPlugin({
-  blockTrackers: true, // default: false
-});
-puppeteer.use(Adblocker);
+const axios = require('axios');
 
 const router = express.Router();
 
 router.get('/:keyword', async (req, res) => {
   try {
     const { keyword } = req.params;
-    const BASE_URL = "https://animepahe.ru/";
+    const API_URL = `https://animepahe.ru/api?m=search&q=${encodeURIComponent(keyword)}`;
 
-    const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      headless: true,
-    });
+    const response = await axios.get(API_URL);
 
-    const page = await browser.newPage();
-    await page.goto(BASE_URL);
+    const { data } = response.data;
 
-    await page.setViewport({
-      width: 1080,
-      height: 720,
-    });
+    const searchResults = data.map((anime) => ({
+      title: anime.title || 'No Title',
+      img: anime.poster || '',
+      url: `https://animepahe.ru/anime/${anime.session}`,
+      id: anime.session || '',
+    }));
 
-    await page.waitForSelector('.navbar');
-
-    await page.type('input[name=q]', keyword, { delay: 20 });
-
-    await page.waitForSelector('.search-results');
-
-    const data = await page.evaluate(() => {
-      const animeList = Array.from(document.querySelectorAll('.search-results li'));
-      return animeList.map((anime) => ({
-        title: anime.querySelector('.result-title')?.textContent?.trim() || 'No Title',
-        img: anime.querySelector('a img')?.getAttribute("data-src") || '',
-        url: `https://animepahe.ru${anime.querySelector('a')?.getAttribute('href') || ''}`,
-        id: anime.querySelector('a')?.getAttribute('href')?.split('/').pop() || '',
-      }));
-    });
-
-    await browser.close();
-
-    res.json(data);
+    res.json(searchResults);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'An error occurred while scraping the website' });
+    res.status(500).json({ error: 'An error occurred while fetching search results' });
   }
 });
 

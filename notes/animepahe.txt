@@ -1,0 +1,3 @@
+https://animepahe.ru/api?m=search&q=
+
+https://animepahe.ru/api?m=release&id=f45e691c-01e6-a073-5697-7aa04900640a&sort=asc&page=8

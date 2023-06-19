@@ -34,6 +34,8 @@ const paheWatchRoutes = require('./api/anime/pahe/watch');
 
 const moviesSearchRoutes = require('./api/movie/123movies/search');
 
+const paheMovieSearchRoutes = require('./api/movie/pahe/search');
+
 // Register routes
 app.use('/api/anime/gogo/search', gogoSearchRoutes);
 app.use('/api/anime/gogo/watch', gogoWatchRoutes);
@@ -46,6 +48,8 @@ app.use('/api/anime/pahe/search', paheSearchRoutes);
 app.use('/api/anime/pahe/watch', paheWatchRoutes);
 
 app.use('/api/movie/123movies/search', moviesSearchRoutes);
+
+app.use('/api/movie/pahe/search', paheMovieSearchRoutes);
 
 // Start the server
 app.listen(process.env.PORT || 3000, () => console.log("Server is running..."));
