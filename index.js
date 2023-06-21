@@ -32,6 +32,9 @@ const gotakuSearchRoutes = require('./api/anime/gotaku/search');
 const paheSearchRoutes = require('./api/anime/pahe/search');
 const paheWatchRoutes = require('./api/anime/pahe/watch');
 
+const zoroSearchRoutes = require('./api/anime/zoro/search');
+const zoroWatchRoutes = require('./api/anime/zoro/watch');
+
 const moviesSearchRoutes = require('./api/movie/123movies/search');
 
 const paheMovieSearchRoutes = require('./api/movie/pahe/search');
@@ -49,6 +52,9 @@ app.use('/api/anime/gotaku/search', gotakuSearchRoutes);
 
 app.use('/api/anime/pahe/search', paheSearchRoutes);
 app.use('/api/anime/pahe/watch', paheWatchRoutes);
+
+app.use('/api/anime/zoro/search', zoroSearchRoutes);
+app.use('/api/anime/zoro/watch', zoroWatchRoutes);
 
 app.use('/api/movie/123movies/search', moviesSearchRoutes);
 
