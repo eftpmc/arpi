@@ -1,46 +1,38 @@
 const express = require('express');
-const puppeteer = require('puppeteer-extra');
-
-// Add stealth plugin and use defaults (all evasion techniques)
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-puppeteer.use(StealthPlugin());
-
-const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
-const Adblocker = AdblockerPlugin({
-  blockTrackers: true, // default: false
-});
-puppeteer.use(Adblocker);
+const axios = require('axios');
+const cheerio = require('cheerio');
 
 const router = express.Router();
 
 router.get('/:keyword', async (req, res) => {
   try {
     const { keyword } = req.params;
-    const searchUrl = `https://gogoanime.hu/search.html?keyword=${encodeURIComponent(keyword)}`;
+    const API_URL = `https://gogoanime.hu/search.html?keyword=${encodeURIComponent(keyword)}`;
 
-    const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      headless: true,
+    const response = await axios.get(API_URL);
+    const $ = cheerio.load(response.data);
+
+    const searchResults = [];
+
+    $('.items li').each((index, element) => {
+      const $item = $(element);
+      const title = $item.find('.name a').text().trim();
+      const img = $item.find('.img a img').attr('src');
+      const url = `https://gogoanime.hu${$item.find('.name a').attr('href')}`;
+      const id = url.split("/").pop();
+
+      searchResults.push({
+        title: title || 'No Title',
+        img: img || '',
+        url,
+        id,
+      });
     });
 
-    const page = await browser.newPage();
-    await page.goto(searchUrl);
-
-    const data = await page.evaluate(() => {
-      const animeList = Array.from(document.querySelectorAll('.items li'));
-      return animeList.map((anime) => ({
-        title: anime.querySelector('.name a').textContent.trim(),
-        url: `https://gogoanime.hu/${anime.querySelector('.name a').getAttribute('href').replace(/^\/category\//, '')}-episode-1`,
-        id: anime.querySelector('.name a').getAttribute('href').replace(/^\/category\//, ''),
-      }));
-    });
-
-    await browser.close();
-
-    res.json(data);
+    res.json(searchResults);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'An error occurred while scraping the website' });
+    res.status(500).json({ error: 'An error occurred while fetching search results' });
   }
 });
 
