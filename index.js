@@ -22,43 +22,19 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => res.send("<h1>api 😾</h1>"));
 
 // Load routes
-const gogoSearchRoutes = require('./api/anime/gogo/search');
-const gogoWatchRoutes = require('./api/anime/gogo/watch');
-
-const nineSearchRoutes = require('./api/anime/9anime/search');
-
-const gotakuSearchRoutes = require('./api/anime/gotaku/search');
-
 const paheSearchRoutes = require('./api/anime/pahe/search');
-const paheWatchRoutes = require('./api/anime/pahe/watch');
 
 const zoroSearchRoutes = require('./api/anime/zoro/search');
 const zoroWatchRoutes = require('./api/anime/zoro/watch');
-
-const moviesSearchRoutes = require('./api/movie/123movies/search');
-
-const paheMovieSearchRoutes = require('./api/movie/pahe/search');
 
 const flixSearchRoutes = require('./api/movie/flixhq/search');
 const flixWatchRoutes = require('./api/movie/flixhq/watch');
 
 // Register routes
-app.use('/api/anime/gogo/search', gogoSearchRoutes);
-app.use('/api/anime/gogo/watch', gogoWatchRoutes);
-
-app.use('/api/anime/9anime/search', nineSearchRoutes);
-
-app.use('/api/anime/gotaku/search', gotakuSearchRoutes);
-
 app.use('/api/anime/pahe/search', paheSearchRoutes);
-app.use('/api/anime/pahe/watch', paheWatchRoutes);
 
 app.use('/api/anime/zoro/search', zoroSearchRoutes);
 app.use('/api/anime/zoro/watch', zoroWatchRoutes);
-
-app.use('/api/movie/123movies/search', moviesSearchRoutes);
-
-app.use('/api/movie/pahe/search', paheMovieSearchRoutes);
 
 app.use('/api/movie/flixhq/search', flixSearchRoutes);
 app.use('/api/movie/flixhq/watch', flixWatchRoutes);
