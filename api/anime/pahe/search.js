@@ -6,13 +6,22 @@ const router = express.Router();
 router.get('/:keyword', async (req, res) => {
   try {
     const { keyword } = req.params;
+    const BASE_URL = `https://animepahe.ru`
     const API_URL = `https://animepahe.ru/api?m=search&q=${encodeURIComponent(keyword)}`;
 
-    const response = await axios.get(API_URL);
+    const refererLink = new URL(BASE_URL);
 
-    const { data } = response.data;
+    const options = {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Referer': refererLink.href,
+      },
+    };
 
-    const searchResults = data.map((anime) => ({
+    const response = await axios.get(API_URL, options);
+    const animeData = response.data.data;
+
+    const searchResults = animeData.map((anime) => ({
       title: anime.title || 'No Title',
       img: anime.poster || '',
       url: `https://animepahe.ru/anime/${anime.session}`,

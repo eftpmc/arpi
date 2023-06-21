@@ -1,6 +1,5 @@
 const express = require('express');
 const axios = require('axios');
-const { js_beautify } = require('js-beautify');
 
 const { mainChecker } = require('../../../util/source');
 
