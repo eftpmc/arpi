@@ -1,3 +1,11 @@
 https://animepahe.ru/api?m=search&q=
 
 https://animepahe.ru/api?m=release&id=f45e691c-01e6-a073-5697-7aa04900640a&sort=asc&page=8
+
+https://kwik.cx/e/4q3V1NDdRVy9
+
+http://cdn.jsdelivr.net/npm/hls.js/dist/hls.min.js
+
+https://na-01.files.nextcdn.org/stream/01/03/b92a392054c041a3f9c6eecabeb0e127183f44e547828447b10bca8d77523e6f/uwu.m3u8
+
+https://na-01.files.nextcdn.org/stream/01/03/b92a392054c041a3f9c6eecabeb0e127183f44e547828447b10bca8d77523e6f/uwu.m3u8
