@@ -30,10 +30,8 @@ router.get('/:id', async (req, res) => {
 
       const { data } = await axios.get(`https://rapid-cloud.co/ajax/embed-6/getSources?id=${fileId}`,options);
       const key = await (await axios.get('https://raw.githubusercontent.com/enimax-anime/key/e6/key.txt')).data;
-
-      console.log(data)
         
-      source = cryptoJs.AES.decrypt(data.sources, key).toString(cryptoJs.enc.Utf8)
+      source = JSON.parse(cryptoJs.AES.decrypt(data.sources, key).toString(cryptoJs.enc.Utf8));
 
       res.json({ source });
     } catch (error) {
