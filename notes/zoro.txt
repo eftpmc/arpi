@@ -1,3 +1,7 @@
+https://zoro.to/ajax/v2/episode/list/677
+
+https://zoro.to/ajax/v2/episode/servers?episodeId=94736
+
 https://zoro.to/ajax/v2/episode/sources?id=992562
 
 https://rapid-cloud.co/embed-6/pk0fQx7p8rE0?k=1
