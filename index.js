@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const stream = require('stream');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -13,7 +14,7 @@ app.use(cors());
 
 // Custom CORS headers
 app.use((req, res, next) => {
-  const allowedOrigins = ['http://localhost:5173', 'https://aritools.vercel.app','https://superb-kheer-7cb5da.netlify.app'];
+  const allowedOrigins = ['http://localhost:5173', 'https://aritools.vercel.app', 'https://superb-kheer-7cb5da.netlify.app'];
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
@@ -36,33 +37,37 @@ app.get('/video-proxy', async (req, res) => {
   }
 
   try {
-    const response = await axios.get(videoUrl, { responseType: 'arraybuffer' });
-    const contentType = response.headers['content-type'];
+    const axiosStream = await axios.get(videoUrl, {
+      responseType: 'stream',
+      timeout: 5000
+    });
 
-    console.log('Fetched content with type:', contentType);
-
+    const contentType = axiosStream.headers['content-type'];
     if (contentType === 'application/vnd.apple.mpegurl' || contentType === 'application/x-mpegURL') {
-      const baseUrl = videoUrl.slice(0, videoUrl.lastIndexOf('/') + 1);
-      
-      const modifiedPlaylist = response.data.toString().split('\n')
-        .map(line => {
-          if (line.endsWith('.ts') || line.endsWith('.m3u8')) {
-            const path = encodeURIComponent(line);
-            const modifiedUrl = `https://arpi-api.herokuapp.com/video-proxy?url=${baseUrl}${path}`;
-            console.log('Modified URL:', modifiedUrl);
-            return modifiedUrl;
-          }
-          return line;
-        })
-        .join('\n');
+      res.set('Content-Type', contentType);
 
-      console.log('Sending modified playlist');
-      res.set('Content-Type', contentType);
-      res.send(modifiedPlaylist);
+      const transformer = new stream.Transform({
+        transform(chunk, encoding, callback) {
+          const baseUrl = videoUrl.slice(0, videoUrl.lastIndexOf('/') + 1);
+          const lines = chunk.toString().split('\n');
+          const modifiedLines = lines.map(line => {
+            line = line.trim();
+            if (line.endsWith('.ts') || line.endsWith('.m3u8')) {
+              const path = line;
+              const modifiedUrl = `https://arpi-api.herokuapp.com/video-proxy?url=${encodeURIComponent(baseUrl + path)}`;
+              console.log('Modified URL:', modifiedUrl);
+              return modifiedUrl;
+            }
+            return line;
+          });
+          const modifiedChunk = modifiedLines.join('\n');
+          callback(null, modifiedChunk);
+        }
+      });
+
+      axiosStream.data.pipe(transformer).pipe(res);
     } else {
-      console.log('Sending content as is');
-      res.set('Content-Type', contentType);
-      res.send(Buffer.from(response.data, 'binary'));
+      axiosStream.data.pipe(res);
     }
   } catch (error) {
     console.error('Caught error during request:', error);
