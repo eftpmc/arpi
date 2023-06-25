@@ -56,8 +56,6 @@ router.get('/:id/:ep', async (req, res) => {
       }
     });
 
-    const sourceUrlSub = `https://zoro.to/ajax/v2/episode/sources?id=${subDataId}`;
-    const sourceUrlDub = `https://zoro.to/ajax/v2/episode/sources?id=${dubDataId}`;
     const options = {
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
@@ -65,32 +63,44 @@ router.get('/:id/:ep', async (req, res) => {
       },
     };
 
-    const [responseSub, responseDub] = await Promise.all([
-      axios.get(sourceUrlSub, options),
-      axios.get(sourceUrlDub, options),
-    ]);
+    let subSource = null;
+    let dubSource = null;
 
-    const { link: linkSub } = responseSub.data;
-    const { link: linkDub } = responseDub.data;
-    const refererLinkSub = new URL(linkSub);
-    const refererLinkDub = new URL(linkDub);
-    const fileIdSub = linkSub.split('/').pop().split('?')[0];
-    const fileIdDub = linkDub.split('/').pop().split('?')[0];
+    // Only process sub if subDataId is present
+    if (subDataId) {
+        const sourceUrlSub = `https://zoro.to/ajax/v2/episode/sources?id=${subDataId}`;
+        const responseSub = await axios.get(sourceUrlSub, options);
+        const { link: linkSub } = responseSub.data;
 
-    const optionsSub = { headers: { ...options.headers, Referer: refererLinkSub.href } };
-    const optionsDub = { headers: { ...options.headers, Referer: refererLinkDub.href } };
+        if (linkSub) {
+            const refererLinkSub = new URL(linkSub);
+            const fileIdSub = linkSub.split('/').pop().split('?')[0];
+            const optionsSub = { headers: { ...options.headers, Referer: refererLinkSub.href } };
+            const dataSub = await axios.get(`https://rapid-cloud.co/ajax/embed-6/getSources?id=${fileIdSub}`, optionsSub);
 
-    const [dataSub, dataDub] = await Promise.all([
-      axios.get(`https://rapid-cloud.co/ajax/embed-6/getSources?id=${fileIdSub}`, optionsSub),
-      axios.get(`https://rapid-cloud.co/ajax/embed-6/getSources?id=${fileIdDub}`, optionsDub),
-    ]);
+            const key = await axios.get('https://raw.githubusercontent.com/enimax-anime/key/e6/key.txt');
+            const decryptedSub = cryptoJs.AES.decrypt(dataSub.data.sources, key.data).toString(cryptoJs.enc.Utf8);
+            subSource = JSON.parse(decryptedSub);
+        }
+    }
 
-    const key = await axios.get('https://raw.githubusercontent.com/enimax-anime/key/e6/key.txt');
-    const decryptedSub = cryptoJs.AES.decrypt(dataSub.data.sources, key.data).toString(cryptoJs.enc.Utf8);
-    const decryptedDub = cryptoJs.AES.decrypt(dataDub.data.sources, key.data).toString(cryptoJs.enc.Utf8);
+    // Only process dub if dubDataId is present
+    if (dubDataId) {
+        const sourceUrlDub = `https://zoro.to/ajax/v2/episode/sources?id=${dubDataId}`;
+        const responseDub = await axios.get(sourceUrlDub, options);
+        const { link: linkDub } = responseDub.data;
 
-    const subSource = JSON.parse(decryptedSub);
-    const dubSource = JSON.parse(decryptedDub);
+        if (linkDub) {
+            const refererLinkDub = new URL(linkDub);
+            const fileIdDub = linkDub.split('/').pop().split('?')[0];
+            const optionsDub = { headers: { ...options.headers, Referer: refererLinkDub.href } };
+            const dataDub = await axios.get(`https://rapid-cloud.co/ajax/embed-6/getSources?id=${fileIdDub}`, optionsDub);
+
+            const key = await axios.get('https://raw.githubusercontent.com/enimax-anime/key/e6/key.txt');
+            const decryptedDub = cryptoJs.AES.decrypt(dataDub.data.sources, key.data).toString(cryptoJs.enc.Utf8);
+            dubSource = JSON.parse(decryptedDub);
+        }
+    }
 
     res.json({ subSource, dubSource });
   } catch (error) {
