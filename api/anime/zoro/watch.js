@@ -20,6 +20,7 @@ router.get('/:id/:ep', async (req, res) => {
 
     $('.ssl-item.ep-item').each((index, element) => {
       const $element = $(element);
+      const episodeNumber = index;
       const watchLink = $element.attr('href');
       const episodeIdFromLink = watchLink.split('=')[1];
 
