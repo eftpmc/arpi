@@ -83,7 +83,7 @@ app.get('/video-proxy', async (req, res) => {
             line = line.trim();
             if (line.endsWith('.ts') || line.endsWith('.m3u8')) {
               const path = line;
-              const modifiedUrl = `http://localhost:3000/video-proxy?url=${encodeURIComponent(baseUrl + path)}`;
+              const modifiedUrl = `https://arpi-api.herokuapp.com/video-proxy?url=${encodeURIComponent(baseUrl + path)}`;
               console.log('Modified URL:', modifiedUrl);
               return modifiedUrl;
             }
