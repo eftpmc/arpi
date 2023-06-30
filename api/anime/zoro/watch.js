@@ -5,6 +5,44 @@ const cryptoJs = require('crypto-js');
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /api/anime/zoro/watch/{id}/{ep}:
+ *   get:
+ *     tags:
+ *       - Anime
+ *     description: Fetches the dubbed and subbed video files for an anime episode from zoro.to
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: id
+ *         description: The ID of the anime
+ *         in: path
+ *         required: true
+ *         type: string
+ *       - name: ep
+ *         description: The episode number
+ *         in: path
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Object containing links to subbed and dubbed video files
+ *         schema:
+ *           type: object
+ *           properties:
+ *             subSource:
+ *               type: object
+ *               description: The source object for the subbed version
+ *             dubSource:
+ *               type: object
+ *               description: The source object for the dubbed version
+ *       400:
+ *         description: ID and episode are required
+ *       500:
+ *         description: An error occurred while fetching episode links
+ */
+
 router.get('/:id/:ep', async (req, res) => {
   try {
     const { id, ep } = req.params;

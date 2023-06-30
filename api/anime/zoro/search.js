@@ -4,6 +4,45 @@ const cheerio = require('cheerio');
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /api/anime/zoro/search/{keyword}:
+ *   get:
+ *     tags:
+ *       - Anime
+ *     description: Search for anime on zoro.to by keyword
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: keyword
+ *         description: The keyword to search for
+ *         in: path
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: An array of search results
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: The title of the anime
+ *               img:
+ *                 type: string
+ *                 description: The URL of the anime's image
+ *               url:
+ *                 type: string
+ *                 description: The URL of the anime's page
+ *               id:
+ *                 type: string
+ *                 description: The ID of the anime
+ *       500:
+ *         description: An error occurred while fetching search results
+ */
+
 router.get('/:keyword', async (req, res) => {
   try {
     const { keyword } = req.params;

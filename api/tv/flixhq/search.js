@@ -6,39 +6,39 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/movie/flixhq/search/{keyword}:
+ * /api/tvshows/flixhq/search/{keyword}:
  *   get:
- *     summary: Search for movies on FlixHQ
- *     tags: [Movies]
+ *     tags:
+ *       - TV Shows
+ *     description: Searches for TV shows on flixhq using the provided keyword
+ *     produces:
+ *       - application/json
  *     parameters:
- *       - in: path
- *         name: keyword
- *         schema:
- *           type: string
+ *       - name: keyword
+ *         description: The keyword to search for TV shows
+ *         in: path
  *         required: true
- *         description: Keyword to search for
+ *         type: string
  *     responses:
  *       200:
- *         description: A list of movies
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   title:
- *                     type: string
- *                     description: The movie title
- *                   img:
- *                     type: string
- *                     description: URL of the movie's image
- *                   url:
- *                     type: string
- *                     description: URL of the movie on FlixHQ
- *                   id:
- *                     type: string
- *                     description: The movie ID
+ *         description: An array of TV shows that match the search keyword
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: The title of the TV show
+ *               img:
+ *                 type: string
+ *                 description: The URL of the TV show's poster image
+ *               url:
+ *                 type: string
+ *                 description: The URL of the TV show on flixhq
+ *               id:
+ *                 type: string
+ *                 description: The ID of the TV show on flixhq
  *       500:
  *         description: An error occurred while fetching search results
  */
@@ -62,7 +62,7 @@ router.get('/:keyword', async (req, res) => {
       const id = url.match(/(\d+)$/)[1];
       const type = $item.find('.fdi-type').text().trim();
 
-      if (type === 'Movie') {
+      if (type === 'TV') {
         searchResults.push({
           title: title || 'No Title',
           img: img || '',
