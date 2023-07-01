@@ -2,9 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const stream = require('stream');
-const swaggerUi = require('swagger-ui-express');
-const swaggerJsdoc = require('swagger-jsdoc');
-const yaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
 
@@ -14,7 +11,6 @@ const port = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 app.use(cors());
-app.use(express.static('public'));
 
 // Custom CORS headers
 app.use((req, res, next) => {
@@ -27,13 +23,6 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
-
-// Load Swagger configuration file
-const swaggerDocument = yaml.load(fs.readFileSync('docs/swagger-config.yaml', 'utf8'));
-swaggerDocument.apis = ['./v1/**/*.js'];
-
-const swaggerSpec = swaggerJsdoc({ definition: swaggerDocument, apis: ['./v1/**/*.js'] });
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Proxy route for handling video URLs
 app.get('/video-proxy', async (req, res) => {
@@ -61,7 +50,7 @@ app.get('/video-proxy', async (req, res) => {
             line = line.trim();
             if (line.endsWith('.ts') || line.endsWith('.m3u8')) {
               const path = line;
-              const modifiedUrl = `https://arpi-api.herokuapp.com/video-proxy?url=${encodeURIComponent(baseUrl + path)}`;
+              const modifiedUrl = `http://localhost:3000/video-proxy?url=${encodeURIComponent(baseUrl + path)}`;
               console.log('Modified URL:', modifiedUrl);
               return modifiedUrl;
             }
@@ -83,9 +72,7 @@ app.get('/video-proxy', async (req, res) => {
 });
 
 // Home route
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.get('/', (req, res) => res.send("<h1>apri api baby😾</h1>"));
 
 // Additional routes
 const routes = [
