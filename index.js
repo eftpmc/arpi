@@ -4,15 +4,17 @@ const axios = require('axios');
 const stream = require('stream');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
+const yaml = require('js-yaml');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware to parse JSON bodies
+// Middleware
 app.use(express.json());
-
-// Use CORS
 app.use(cors());
+app.use(express.static('public'));
 
 // Custom CORS headers
 app.use((req, res, next) => {
@@ -21,54 +23,30 @@ app.use((req, res, next) => {
   if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE'); // Allow specific HTTP methods
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow specific headers
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
 
-// Swagger definition
-const swaggerDefinition = {
-  openapi: '3.0.0',
-  info: {
-    title: 'arpi',
-    version: '1.0.0',
-    description: 'API documentation for arpi',
-  },
-  servers: [
-    {
-      url: 'http://localhost:3000',
-      description: 'Local server',
-    },
-  ],
-};
+// Load Swagger configuration file
+const swaggerDocument = yaml.load(fs.readFileSync('docs/swagger-config.yaml', 'utf8'));
+swaggerDocument.apis = ['./v1/**/*.js'];
 
-// Options for the swagger docs
-const options = {
-  swaggerDefinition,
-  // Paths to files containing OpenAPI definitions
-  apis: ['./api/**/*.js'],
-};
-
-const swaggerSpec = swaggerJsdoc(options);
-
-// Use Swagger
+const swaggerSpec = swaggerJsdoc({ definition: swaggerDocument, apis: ['./v1/**/*.js'] });
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Proxy route for handling video URLs
 app.get('/video-proxy', async (req, res) => {
   const videoUrl = req.query.url;
-  console.log('Received request with video URL:', videoUrl);
 
   if (!videoUrl) {
-    console.log('Error: Missing url parameter');
-    res.status(400).send('The url parameter is required');
-    return;
+    return res.status(400).send('The url parameter is required');
   }
 
   try {
     const axiosStream = await axios.get(videoUrl, {
       responseType: 'stream',
-      timeout: 5000
+      timeout: 5000,
     });
 
     const contentType = axiosStream.headers['content-type'];
@@ -91,7 +69,7 @@ app.get('/video-proxy', async (req, res) => {
           });
           const modifiedChunk = modifiedLines.join('\n');
           callback(null, modifiedChunk);
-        }
+        },
       });
 
       axiosStream.data.pipe(transformer).pipe(res);
@@ -100,37 +78,30 @@ app.get('/video-proxy', async (req, res) => {
     }
   } catch (error) {
     console.error('Caught error during request:', error);
-    if (error.response) {
-      console.error('Error response from the server:', error.response.data);
-      res.status(500).send('Error occurred while fetching the video from the server');
-    } else if (error.request) {
-      console.error('No response received:', error.request);
-      res.status(500).send('No response received from the video server');
-    } else {
-      console.error('Error', error.message);
-      res.status(500).send('An unknown error occurred');
-    }
+    res.status(500).send('Error occurred while fetching the video from the server');
   }
 });
 
-// Define your routes and handlers here
-app.get('/', (req, res) => res.send("<h1>api 😾 go to /docs for documentation whoooo!</h1>"));
+// Home route
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
-// Load routes
-const paheSearchRoutes = require('./api/anime/pahe/search');
-const zoroSearchRoutes = require('./api/anime/zoro/search');
-const zoroWatchRoutes = require('./api/anime/zoro/watch');
-const flixMovieSearchRoutes = require('./api/movie/flixhq/search');
-const flixMovieWatchRoutes = require('./api/movie/flixhq/watch');
-const flixTvSearchRoutes = require('./api/tv/flixhq/search');
+// Additional routes
+const routes = [
+  { path: '/v1/anime/pahe/search', file: './v1/anime/pahe/search' },
+  { path: '/v1/anime/zoro/search', file: './v1/anime/zoro/search' },
+  { path: '/v1/anime/zoro/watch', file: './v1/anime/zoro/watch' },
+  { path: '/v1/movie/flixhq/search', file: './v1/movie/flixhq/search' },
+  { path: '/v1/movie/flixhq/watch', file: './v1/movie/flixhq/watch' },
+  { path: '/v1/tv/flixhq/search', file: './v1/tv/flixhq/search' },
+  { path: '/v1/manga/mangadex/search', file: './v1/manga/mangadex/search' },
+  { path: '/v1/lightnovel/webnovel/search', file: './v1/lightnovel/webnovel/search' },
+];
 
-// Register routes
-app.use('/api/anime/pahe/search', paheSearchRoutes);
-app.use('/api/anime/zoro/search', zoroSearchRoutes);
-app.use('/api/anime/zoro/watch', zoroWatchRoutes);
-app.use('/api/movie/flixhq/search', flixMovieSearchRoutes);
-app.use('/api/movie/flixhq/watch', flixMovieWatchRoutes);
-app.use('/api/tv/flixhq/search', flixTvSearchRoutes);
+for (const route of routes) {
+  app.use(route.path, require(route.file));
+}
 
-// Start the server
+// Start server
 app.listen(port, () => console.log(`Server is running on port ${port}`));

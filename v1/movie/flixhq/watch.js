@@ -15,60 +15,7 @@ function isJson(data) {
     return true;
 }
 
-/**
- * @swagger
- * /api/movie/flixhq/watch/{id}:
- *   get:
- *     summary: Retrieve video file for a movie from FlixHQ
- *     tags: [Movies]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: ID of the movie
- *     responses:
- *       200:
- *         description: Video file data for the movie
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 m3u8Data:
- *                   type: object
- *                   properties:
- *                     sources:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           url:
- *                             type: string
- *                             description: URL of the video file
- *                           quality:
- *                             type: string
- *                             description: Quality of the video
- *                           isM3U8:
- *                             type: boolean
- *                             description: Indicates if the URL is an m3u8 file
- *                     subtitles:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           url:
- *                             type: string
- *                             description: URL of the subtitle file
- *                           lang:
- *                             type: string
- *                             description: Language of the subtitle
- *       400:
- *         description: ID is required
- *       500:
- *         description: An error occurred while fetching episode links
- */
+
 
 router.get('/:id', async (req, res) => {
     try {

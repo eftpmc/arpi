@@ -1,0 +1,52 @@
+/* Reset some default styles in the browser */
+body, h1, p {
+    margin: 0;
+    padding: 0;
+}
+
+/* Set a background color to the whole body */
+body {
+    background-color: #F6F6F9;
+    font-family: Arial, sans-serif;
+}
+
+/* Center the container */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Add some spacing and text formatting to content */
+.content {
+    text-align: center;
+}
+
+.content h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+.content p {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+}
+
+/* Style the button */
+.btn {
+    display: inline-block;
+    padding: 15px 30px;
+    font-size: 1em;
+    text-align: center;
+    text-decoration: none;
+    background-color: #000;
+    color: #fff;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #444;
+}
+

@@ -1,0 +1,272 @@
+openapi: "3.0.0"
+info:
+  title: "arpi media api"
+  version: "1.0.0"
+  description: "API documentation for our powerful API for accessing anime, movies, and TV shows."
+
+paths:
+  /v1/anime/zoro/search/{keyword}:
+    get:
+      tags:
+        - Anime
+      summary: "Search for anime on zoro.to by keyword"
+      description: "This endpoint allows you to search for anime by a keyword."
+      parameters:
+        - name: keyword
+          in: path
+          description: "The keyword to search for"
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "An array of search results"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      description: "The title of the anime"
+                    img:
+                      type: string
+                      description: "The URL of the anime's image"
+                    url:
+                      type: string
+                      description: "The URL of the anime's page"
+                    id:
+                      type: string
+                      description: "The ID of the anime"
+        "500":
+          description: "An error occurred while fetching search results"
+
+  /v1/anime/zoro/watch/{id}/{ep}:
+    get:
+      tags:
+        - Anime
+      summary: "Fetches the dubbed and subbed video files for an anime episode from zoro.to"
+      description: "This endpoint allows you to fetch video files for a specific anime episode."
+      parameters:
+        - name: id
+          in: path
+          description: "The ID of the anime"
+          required: true
+          schema:
+            type: string
+        - name: ep
+          in: path
+          description: "The episode number"
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Object containing links to subbed and dubbed video files"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subSource:
+                    type: object
+                    description: "The source object for the subbed version"
+                  dubSource:
+                    type: object
+                    description: "The source object for the dubbed version"
+        "400":
+          description: "ID and episode are required"
+        "500":
+          description: "An error occurred while fetching episode links"
+
+  /v1/lightnovel/webnovel/search/{keyword}:
+    get:
+      tags:
+        - Light Novels
+      summary: "Search for light novels by keyword using the WebNovel website"
+      parameters:
+        - name: keyword
+          in: path
+          description: "Keyword to search for light novels on WebNovel"
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "An array of light novels from WebNovel that match the keyword"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                    url:
+                      type: string
+                    id:
+                      type: string
+        "500":
+          description: "An error occurred while fetching search results from WebNovel"
+
+  /v1/manga/mangadex/search/{keyword}:
+    get:
+      tags:
+        - Manga
+      summary: "Search for manga by keyword using the MangaDex API"
+      parameters:
+        - name: keyword
+          in: path
+          description: "Keyword to search for manga on MangaDex"
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "An array of manga from MangaDex that match the keyword"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                    id:
+                      type: string
+                    filename:
+                      type: string
+        "500":
+          description: "An error occurred while fetching search results from MangaDex"
+
+  /v1/movie/flixhq/search/{keyword}:
+    get:
+      tags:
+        - Movies
+      summary: "Search for movies on FlixHQ"
+      parameters:
+        - in: path
+          name: keyword
+          schema:
+            type: string
+          required: true
+          description: "Keyword to search for"
+      responses:
+        "200":
+          description: "A list of movies"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      description: "The movie title"
+                    img:
+                      type: string
+                      description: "URL of the movie's image"
+                    url:
+                      type: string
+                      description: "URL of the movie on FlixHQ"
+                    id:
+                      type: string
+                      description: "The movie ID"
+        "500":
+          description: "An error occurred while fetching search results"
+
+  /v1/movie/flixhq/watch/{id}:
+    get:
+      tags:
+        - Movies
+      summary: "Retrieve video file for a movie from FlixHQ"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: "ID of the movie"
+      responses:
+        "200":
+          description: "Video file data for the movie"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  m3u8Data:
+                    type: object
+                    properties:
+                      sources:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            url:
+                              type: string
+                              description: "URL of the video file"
+                            quality:
+                              type: string
+                              description: "Quality of the video"
+                            isM3U8:
+                              type: boolean
+                              description: "Indicates if the URL is an m3u8 file"
+                      subtitles:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            url:
+                              type: string
+                              description: "URL of the subtitle file"
+                            lang:
+                              type: string
+                              description: "Language of the subtitle"
+        "400":
+          description: "ID is required"
+        "500":
+          description: "An error occurred while fetching episode links"
+
+  /v1/tvshows/flixhq/search/{keyword}:
+    get:
+      tags:
+        - TV Shows
+      summary: "Searches for TV shows on FlixHQ using the provided keyword"
+      parameters:
+        - name: keyword
+          in: path
+          description: "The keyword to search for TV shows"
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "An array of TV shows that match the search keyword"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      description: "The title of the TV show"
+                    img:
+                      type: string
+                      description: "The URL of the TV show's poster image"
+                    url:
+                      type: string
+                      description: "The URL of the TV show on FlixHQ"
+                    id:
+                      type: string
+                      description: "The ID of the TV show on FlixHQ"
+        "500":
+          description: "An error occurred while fetching search results"
+

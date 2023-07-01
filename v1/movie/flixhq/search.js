@@ -4,44 +4,7 @@ const cheerio = require('cheerio');
 
 const router = express.Router();
 
-/**
- * @swagger
- * /api/movie/flixhq/search/{keyword}:
- *   get:
- *     summary: Search for movies on FlixHQ
- *     tags: [Movies]
- *     parameters:
- *       - in: path
- *         name: keyword
- *         schema:
- *           type: string
- *         required: true
- *         description: Keyword to search for
- *     responses:
- *       200:
- *         description: A list of movies
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   title:
- *                     type: string
- *                     description: The movie title
- *                   img:
- *                     type: string
- *                     description: URL of the movie's image
- *                   url:
- *                     type: string
- *                     description: URL of the movie on FlixHQ
- *                   id:
- *                     type: string
- *                     description: The movie ID
- *       500:
- *         description: An error occurred while fetching search results
- */
+
 
 router.get('/:keyword', async (req, res) => {
   try {
