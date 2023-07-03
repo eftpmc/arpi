@@ -24,53 +24,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Proxy route for handling video URLs
-app.get('/video-proxy', async (req, res) => {
-  const videoUrl = req.query.url;
-
-  if (!videoUrl) {
-    return res.status(400).send('The url parameter is required');
-  }
-
-  try {
-    const axiosStream = await axios.get(videoUrl, {
-      responseType: 'stream',
-      timeout: 5000,
-    });
-
-    const contentType = axiosStream.headers['content-type'];
-    if (contentType === 'application/vnd.apple.mpegurl' || contentType === 'application/x-mpegURL') {
-      res.set('Content-Type', contentType);
-
-      const transformer = new stream.Transform({
-        transform(chunk, encoding, callback) {
-          const baseUrl = videoUrl.slice(0, videoUrl.lastIndexOf('/') + 1);
-          const lines = chunk.toString().split('\n');
-          const modifiedLines = lines.map(line => {
-            line = line.trim();
-            if (line.endsWith('.ts') || line.endsWith('.m3u8')) {
-              const path = line;
-              const modifiedUrl = `https://arpi-api.herokuapp.com/video-proxy?url=${encodeURIComponent(baseUrl + path)}`;
-              console.log('Modified URL:', modifiedUrl);
-              return modifiedUrl;
-            }
-            return line;
-          });
-          const modifiedChunk = modifiedLines.join('\n');
-          callback(null, modifiedChunk);
-        },
-      });
-
-      axiosStream.data.pipe(transformer).pipe(res);
-    } else {
-      axiosStream.data.pipe(res);
-    }
-  } catch (error) {
-    console.error('Caught error during request:', error);
-    res.status(500).send('Error occurred while fetching the video from the server');
-  }
-});
-
 // Home route
 app.get('/', (req, res) => res.send("<h1>apri api baby😾</h1>"));
 
