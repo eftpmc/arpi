@@ -13,7 +13,7 @@ router.get('/:id/:ep', async (req, res) => {
       return res.status(400).json({ error: 'ID and episode are required' });
     }
 
-    const API_URL = `https://zoro.to/ajax/v2/episode/list/${id}`;
+    const API_URL = `https://aniwatch.to/ajax/v2/episode/list/${id}`;
     const response = await axios.get(API_URL);
     const $ = cheerio.load(response.data.html);
     const episodes = {};
@@ -31,7 +31,7 @@ router.get('/:id/:ep', async (req, res) => {
     });
 
     const episodeId = episodes[ep].episodeId;
-    const serversURL = `https://zoro.to/ajax/v2/episode/servers?episodeId=${episodeId}`;
+    const serversURL = `https://aniwatch.to/ajax/v2/episode/servers?episodeId=${episodeId}`;
     const serversResponse = await axios.get(serversURL);
     const $servers = cheerio.load(serversResponse.data.html);
 
@@ -59,7 +59,7 @@ router.get('/:id/:ep', async (req, res) => {
     const options = {
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
-        'Referer': 'https://zoro.to/',
+        'Referer': 'https://aniwatch.to/',
       },
     };
 
@@ -68,7 +68,7 @@ router.get('/:id/:ep', async (req, res) => {
 
     // Only process sub if subDataId is present
     if (subDataId) {
-        const sourceUrlSub = `https://zoro.to/ajax/v2/episode/sources?id=${subDataId}`;
+        const sourceUrlSub = `https://aniwatch.to/ajax/v2/episode/sources?id=${subDataId}`;
         const responseSub = await axios.get(sourceUrlSub, options);
         const { link: linkSub } = responseSub.data;
 
@@ -86,7 +86,7 @@ router.get('/:id/:ep', async (req, res) => {
 
     // Only process dub if dubDataId is present
     if (dubDataId) {
-        const sourceUrlDub = `https://zoro.to/ajax/v2/episode/sources?id=${dubDataId}`;
+        const sourceUrlDub = `https://aniwatch.to/ajax/v2/episode/sources?id=${dubDataId}`;
         const responseDub = await axios.get(sourceUrlDub, options);
         const { link: linkDub } = responseDub.data;
 
